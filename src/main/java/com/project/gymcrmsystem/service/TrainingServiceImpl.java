@@ -12,8 +12,8 @@ public class TrainingServiceImpl implements TrainingService {
   private TrainingDao trainingDao;
 
   @Autowired
-  public void setTrainingService(TrainingDao trainingService) {
-    this.trainingDao = trainingService;
+  public void setTrainingDao(TrainingDao trainingDao) {
+    this.trainingDao = trainingDao;
   }
 
   @Override

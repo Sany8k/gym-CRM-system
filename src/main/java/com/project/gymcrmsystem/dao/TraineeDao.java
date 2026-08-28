@@ -11,6 +11,8 @@ public interface TraineeDao {
 
   Optional<Trainee> findById(Long id);
 
+  Optional<Trainee> findByUsername(String username);
+
   Trainee save(Trainee trainee);
 
   Trainee update(Trainee trainee);

@@ -1,6 +1,7 @@
 package com.project.gymcrmsystem.service;
 
 import com.project.gymcrmsystem.dao.TraineeDao;
+import com.project.gymcrmsystem.dao.TrainerDao;
 import com.project.gymcrmsystem.model.Trainee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,10 +12,12 @@ import java.util.Optional;
 @Service
 public class TraineeServiceImpl implements TraineeService {
   private TraineeDao traineeDao;
+  private TrainerDao trainerDao;
 
   @Autowired
-  public void setTraineeService(TraineeDao traineeService) {
-    this.traineeDao = traineeService;
+  public void setTraineeDao(TraineeDao traineeDao, TrainerDao trainerDao) {
+    this.traineeDao = traineeDao;
+    this.trainerDao = trainerDao;
   }
 
   @Override
@@ -29,7 +32,15 @@ public class TraineeServiceImpl implements TraineeService {
 
   @Override
   public Trainee save(Trainee trainee) {
-    return null;
+    String username = trainee.getUsername() + "." + trainee.getLastName();
+    if (traineeDao.findByUsername(username).isPresent()) {
+      throw new IllegalArgumentException("Trainee with this username already exists.");
+    }
+    if (trainerDao.findByUsername(username).isPresent()) {
+      throw new IllegalArgumentException("Trainee with this username already exists.");
+    }
+    trainee.setUsername(username);
+    return traineeDao.save(trainee);
   }
 
   @Override

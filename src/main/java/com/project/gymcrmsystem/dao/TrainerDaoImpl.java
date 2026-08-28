@@ -31,6 +31,16 @@ public class TrainerDaoImpl implements TrainerDao {
   }
 
   @Override
+  public Optional<Trainer> findByUsername(String username) {
+    for (Trainer trainer : storage.values()) {
+      if (trainer.getUsername().equals(username)) {
+        return Optional.of(trainer);
+      }
+    }
+    return Optional.empty();
+  }
+
+  @Override
   public Trainer save(Trainer trainer) {
     long id = sequence.incrementAndGet();
     trainer.assignId(id);

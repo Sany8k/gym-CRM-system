@@ -32,6 +32,16 @@ public class TraineeDaoImpl implements TraineeDao {
   }
 
   @Override
+  public Optional<Trainee> findByUsername(String username) {
+    for (Trainee trainee : storage.values()) {
+      if (trainee.getUsername().equals(username)) {
+        return Optional.of(trainee);
+      }
+    }
+    return Optional.empty();
+  }
+
+  @Override
   public Trainee save(Trainee trainee) {
     long id = sequence.incrementAndGet();
     trainee.assignId(id);

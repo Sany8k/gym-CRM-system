@@ -11,6 +11,8 @@ public interface TrainerDao {
 
   Optional<Trainer> findById(Long id);
 
+  Optional<Trainer> findByUsername(String username);
+
   Trainer save(Trainer trainer);
 
   Trainer update(Trainer trainer);
