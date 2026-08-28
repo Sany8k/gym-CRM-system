@@ -13,11 +13,13 @@ import java.util.concurrent.atomic.AtomicLong;
 public class TrainingDaoImpl implements TrainingDao {
 
   private Map<Long, Training> storage;
-  private final AtomicLong sequence = new AtomicLong(0);
+  private AtomicLong sequence;
 
   @Autowired
   public void setStorage(@Qualifier("trainingStorage") Map<Long, Training> storage) {
     this.storage = storage;
+    long maxId = storage.keySet().stream().mapToLong(Long::longValue).max().orElse(0L);
+    this.sequence = new AtomicLong(maxId);
   }
 
   @Override

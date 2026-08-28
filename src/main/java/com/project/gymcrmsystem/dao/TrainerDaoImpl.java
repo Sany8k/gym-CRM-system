@@ -18,7 +18,8 @@ public class TrainerDaoImpl implements TrainerDao {
   @Autowired
   public void setStorage(@Qualifier("trainerStorage") Map<Long, Trainer> storage) {
     this.storage = storage;
-    this.sequence = new AtomicLong(storage.size() + 1);
+    long maxId = storage.keySet().stream().mapToLong(Long::longValue).max().orElse(0L);
+    this.sequence = new AtomicLong(maxId);
   }
 
   @Override

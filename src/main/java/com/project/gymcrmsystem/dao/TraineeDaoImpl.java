@@ -19,7 +19,8 @@ public class TraineeDaoImpl implements TraineeDao {
   @Autowired
   public void setStorage(@Qualifier("traineeStorage") Map<Long, Trainee> storage) {
     this.storage = storage;
-    this.sequence = new AtomicLong(storage.size() + 1);
+    long maxId = storage.keySet().stream().mapToLong(Long::longValue).max().orElse(0L);
+    this.sequence = new AtomicLong(maxId);
   }
 
   @Override
