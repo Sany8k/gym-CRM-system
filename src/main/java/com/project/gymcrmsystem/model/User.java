@@ -16,4 +16,12 @@ public abstract class User {
   private String username;
   private String password;
   private boolean active;
+
+  public void assignId(Long id) {
+    if (this.id != null) {
+      throw new IllegalStateException("ID has already been assigned and cannot be changed.");
+    }
+
+    this.id = id;
+  }
 }
