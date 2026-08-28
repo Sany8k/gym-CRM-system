@@ -11,5 +11,5 @@ public class TrainingType {
   @Setter(value = AccessLevel.NONE)
   private Long id;
 
-  private String type;
+  private String name;
 }

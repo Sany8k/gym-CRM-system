@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class Trainer extends User {
 
-  private String specialization;
+  private TrainingType specialization;
 }
