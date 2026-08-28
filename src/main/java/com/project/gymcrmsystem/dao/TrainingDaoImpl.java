@@ -12,11 +12,11 @@ import java.util.concurrent.atomic.AtomicLong;
 @Repository
 public class TrainingDaoImpl implements TrainingDao {
 
-  private final Map<Long, Training> storage;
+  private Map<Long, Training> storage;
   private final AtomicLong sequence = new AtomicLong(0);
 
   @Autowired
-  public TrainingDaoImpl(@Qualifier("trainingStorage") Map<Long, Training> storage) {
+  public void setStorage(@Qualifier("trainingStorage") Map<Long, Training> storage) {
     this.storage = storage;
   }
 

@@ -13,11 +13,11 @@ import java.util.concurrent.atomic.AtomicLong;
 @Repository
 public class TraineeDaoImpl implements TraineeDao {
 
-  private final Map<Long, Trainee> storage;
+  private Map<Long, Trainee> storage;
   private final AtomicLong sequence = new AtomicLong(0);
 
   @Autowired
-  public TraineeDaoImpl (@Qualifier("traineeStorage") Map<Long, Trainee> storage) {
+  public void setStorage(@Qualifier("traineeStorage") Map<Long, Trainee> storage) {
     this.storage = storage;
   }
 
@@ -41,6 +41,9 @@ public class TraineeDaoImpl implements TraineeDao {
 
   @Override
   public Trainee update(Trainee trainee) {
+    if (!storage.containsKey(trainee.getId())) {
+      throw new IllegalArgumentException("Trainee not found.");
+    }
     storage.replace(trainee.getId(), trainee);
     return trainee;
   }
