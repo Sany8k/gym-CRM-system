@@ -14,11 +14,12 @@ import java.util.concurrent.atomic.AtomicLong;
 public class TraineeDaoImpl implements TraineeDao {
 
   private Map<Long, Trainee> storage;
-  private final AtomicLong sequence = new AtomicLong(0);
+  private AtomicLong sequence;
 
   @Autowired
   public void setStorage(@Qualifier("traineeStorage") Map<Long, Trainee> storage) {
     this.storage = storage;
+    this.sequence = new AtomicLong(storage.size() + 1);
   }
 
   @Override
