@@ -4,7 +4,6 @@ import com.project.gymcrmsystem.model.Trainee;
 import com.project.gymcrmsystem.model.Trainer;
 import com.project.gymcrmsystem.model.Training;
 import com.project.gymcrmsystem.model.TrainingType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.io.Resource;
@@ -23,37 +22,27 @@ public class StorageInitializationPostProcessor implements BeanPostProcessor {
   @Value("${storage.data.file}")
   private Resource dataFile;
 
-  private Map<Long, Trainee> traineeMap;
-  private Map<Long, Trainer> trainerMap;
-  private Map<Long, Training> trainingMap;
-
-  @Autowired
-  public void setTraineeMap(Map<Long, Trainee> traineeMap) {
-    this.traineeMap = traineeMap;
-  }
-
-  @Autowired
-  public void setTrainerMap(Map<Long, Trainer> trainerMap) {
-    this.trainerMap = trainerMap;
-  }
-
-  @Autowired
-  public void setTrainingMap(Map<Long, Training> trainingMap) {
-    this.trainingMap = trainingMap;
-  }
-
   @Override
   public Object postProcessBeforeInitialization(Object bean, String beanName) {
+    if (!"traineeStorage".equals(beanName)
+        && !"trainerStorage".equals(beanName)
+        && !"trainingStorage".equals(beanName)) {
+      return bean;
+    }
+
     try (BufferedReader reader = new BufferedReader(
         new InputStreamReader(dataFile.getInputStream(), StandardCharsets.UTF_8))) {
       String line;
 
       while ((line = reader.readLine()) != null) {
-        String[] parts = line.split("\\|");
+        String[] parts = line.split("\\|", -1);
         switch (beanName) {
           case "traineeStorage": {
             if (!"TRAINEE".equals(parts[0])) {
               break;
+            }
+            if (parts.length != 9) {
+              throw new IllegalArgumentException("Invalid initial data line: " + line);
             }
 
             String id = parts[1];
@@ -75,13 +64,18 @@ public class StorageInitializationPostProcessor implements BeanPostProcessor {
             trainee.setDateOfBirth(LocalDate.parse(date));
             trainee.setAddress(address);
 
-            traineeMap.put(trainee.getId(), trainee);
+            @SuppressWarnings("unchecked")
+            Map<Long, Trainee> storage = (Map<Long, Trainee>) bean;
+            storage.put(trainee.getId(), trainee);
             break;
           }
 
           case "trainerStorage": {
             if (!"TRAINER".equals(parts[0])) {
               break;
+            }
+            if (parts.length != 8) {
+              throw new IllegalArgumentException("Invalid initial data line: " + line);
             }
 
             String id = parts[1];
@@ -103,12 +97,17 @@ public class StorageInitializationPostProcessor implements BeanPostProcessor {
             trainer.setPassword(password);
             trainer.setActive(Boolean.parseBoolean(active));
 
-            trainerMap.put(trainer.getId(), trainer);
+            @SuppressWarnings("unchecked")
+            Map<Long, Trainer> storage = (Map<Long, Trainer>) bean;
+            storage.put(trainer.getId(), trainer);
             break;
           }
           case "trainingStorage": {
             if (!"TRAINING".equals(parts[0])) {
               break;
+            }
+            if (parts.length != 8) {
+              throw new IllegalArgumentException("Invalid initial data line: " + line);
             }
 
             String id = parts[1];
@@ -130,13 +129,15 @@ public class StorageInitializationPostProcessor implements BeanPostProcessor {
             training.setDate(LocalDate.parse(date));
             training.setDuration(Integer.parseInt(duration));
 
-            trainingMap.put(training.getId(), training);
+            @SuppressWarnings("unchecked")
+            Map<Long, Training> storage = (Map<Long, Training>) bean;
+            storage.put(training.getId(), training);
             break;
           }
           }
       }
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new IllegalStateException("Failed to initialize storage from " + dataFile, e);
     }
     return bean;
   }
