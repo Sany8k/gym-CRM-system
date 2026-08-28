@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -13,10 +13,10 @@ public class Training {
   @Setter(value = AccessLevel.NONE)
   private Long id;
 
-  private Trainee traineeId;
-  private Trainer trainerId;
+  private Long traineeId;
+  private Long trainerId;
   private String name;
-  private String type;
-  private Date date;
+  private TrainingType type;
+  private LocalDate date;
   private int duration;
 }

@@ -1,9 +1,13 @@
 package com.project.gymcrmsystem.model;
 
-import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.time.LocalDate;
+
+@Getter
+@Setter
 public class Trainee extends User {
-  private Date dateOfBirth;
+  private LocalDate dateOfBirth;
   private String address;
-  private String userId;
 }
