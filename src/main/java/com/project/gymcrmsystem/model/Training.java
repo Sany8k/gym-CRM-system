@@ -19,4 +19,12 @@ public class Training {
   private TrainingType trainingType;
   private LocalDate date;
   private int duration;
+
+  public void assignId(Long id) {
+    if (this.id != null) {
+      throw new IllegalStateException("ID has already been assigned and cannot be changed.");
+    }
+
+    this.id = id;
+  }
 }

@@ -2,9 +2,12 @@ package com.project.gymcrmsystem.dao;
 
 import com.project.gymcrmsystem.model.Trainee;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface TraineeDao {
+
+  List<Trainee> findAll();
 
   Optional<Trainee> findById(Long id);
 
@@ -12,5 +15,5 @@ public interface TraineeDao {
 
   Trainee update(Trainee trainee);
 
-  void delete(Long id);
+  void deleteById(Long id);
 }
