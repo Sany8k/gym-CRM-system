@@ -7,7 +7,6 @@ import com.project.gymcrmsystem.util.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,7 +57,11 @@ public class TrainerServiceImpl implements TrainerService {
 
   @Override
   public Trainer update(Trainer trainer) {
-    return null;
+    Trainer existing = trainerDao.findById(trainer.getId())
+        .orElseThrow(() -> new IllegalArgumentException("Trainer not found"));
+    trainer.setUsername(existing.getUsername());
+    trainer.setPassword(existing.getPassword());
+    return trainerDao.update(trainer);
   }
 
   private boolean isUsernameTaken(String username) {
