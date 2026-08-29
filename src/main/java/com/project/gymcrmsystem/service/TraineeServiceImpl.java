@@ -55,8 +55,11 @@ public class TraineeServiceImpl implements TraineeService {
     }
     trainee.setUsername(username);
     trainee.setPassword(passwordGenerator.generateRandomPassword());
-    log.info("Trainee created with id={} and username={}", trainee.getId(), trainee.getUsername());
-    return traineeDao.save(trainee);
+    Trainee saved = traineeDao.save(trainee);
+
+    log.info("Trainee created with id={} and username={}", saved.getId(), saved.getUsername());
+
+    return saved;
   }
 
   @Override
@@ -71,8 +74,11 @@ public class TraineeServiceImpl implements TraineeService {
     trainee.setUsername(existing.getUsername());
     trainee.setPassword(existing.getPassword());
 
-    log.info("Trainee updated with id={} and username={}", trainee.getId(), trainee.getUsername());
-    return traineeDao.update(trainee);
+    Trainee updated = traineeDao.update(trainee);
+
+    log.info("Trainee updated with id={} and username={}", updated.getId(), updated.getUsername());
+
+    return updated;
   }
 
   @Override

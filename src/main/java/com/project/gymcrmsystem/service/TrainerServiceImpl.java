@@ -55,8 +55,12 @@ public class TrainerServiceImpl implements TrainerService {
     }
     trainer.setUsername(username);
     trainer.setPassword(passwordGenerator.generateRandomPassword());
-    log.info("Trainer created with id={} and username={}", trainer.getId(), trainer.getUsername());
-    return trainerDao.save(trainer);
+
+    Trainer saved = trainerDao.save(trainer);
+
+    log.info("Trainer created with id={} and username={}", saved.getId(), saved.getUsername());
+
+    return saved;
   }
 
   @Override
@@ -69,8 +73,11 @@ public class TrainerServiceImpl implements TrainerService {
         });
     trainer.setUsername(existing.getUsername());
     trainer.setPassword(existing.getPassword());
-    log.info("Trainer updated with id={} and username={}", trainer.getId(), trainer.getUsername());
-    return trainerDao.update(trainer);
+    Trainer updated = trainerDao.update(trainer);
+
+    log.info("Trainer updated with id={} and username={}", updated.getId(), updated.getUsername());
+
+    return updated;
   }
 
   private boolean isUsernameTaken(String username) {

@@ -51,7 +51,11 @@ public class TrainingServiceImpl implements TrainingService {
       throw new IllegalArgumentException("Trainer not found");
     }
 
-    log.info("Training created with id={} and traineeId={} and trainerId={}", training.getId(), training.getTraineeId(), training.getTrainerId());
-    return trainingDao.save(training);
+    Training saved = trainingDao.save(training);
+
+    log.info("Training created with id={} and traineeId={} and trainerId={}",
+        saved.getId(), saved.getTraineeId(), saved.getTrainerId());
+
+    return saved;
   }
 }

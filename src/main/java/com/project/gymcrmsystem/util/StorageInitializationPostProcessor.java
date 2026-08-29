@@ -37,14 +37,14 @@ public class StorageInitializationPostProcessor implements BeanPostProcessor {
       String line;
 
       while ((line = reader.readLine()) != null) {
-        log.debug("Creating initial data for bean {} from line: {}", beanName, line);
+        log.debug("Creating initial data for bean {} from line", beanName);
         String[] parts = line.split("\\|", -1);
         switch (beanName) {
           case "traineeStorage": {
             if (!"TRAINEE".equals(parts[0])) {
               break;
             }
-            log.debug("Processing trainee data: {}", line);
+            log.debug("Processing trainee data");
             if (parts.length != 9) {
               log.warn("Invalid initial data line for trainee: {}", line);
               throw new IllegalArgumentException("Invalid initial data line: " + line);
@@ -150,7 +150,6 @@ public class StorageInitializationPostProcessor implements BeanPostProcessor {
           }
       }
     } catch (IOException e) {
-      log.warn("Failed to initialize storage from {}: {}", dataFile, e.getMessage());
       throw new IllegalStateException("Failed to initialize storage from " + dataFile, e);
     }
     return bean;
