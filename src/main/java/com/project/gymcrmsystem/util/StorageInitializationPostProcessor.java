@@ -46,8 +46,8 @@ public class StorageInitializationPostProcessor implements BeanPostProcessor {
             }
             log.debug("Processing trainee data");
             if (parts.length != 9) {
-              log.warn("Invalid initial data line for trainee: {}", line);
-              throw new IllegalArgumentException("Invalid initial data line: " + line);
+              log.warn("Invalid initial data line for trainee");
+              throw new IllegalArgumentException("Invalid initial data line");
             }
 
             String id = parts[1];
@@ -79,10 +79,10 @@ public class StorageInitializationPostProcessor implements BeanPostProcessor {
             if (!"TRAINER".equals(parts[0])) {
               break;
             }
-            log.debug("Processing trainer data: {}", line);
+            log.debug("Processing trainer data");
             if (parts.length != 8) {
-              log.warn("Invalid initial data line for trainer: {}", line);
-              throw new IllegalArgumentException("Invalid initial data line: " + line);
+              log.warn("Invalid initial data line for trainer");
+              throw new IllegalArgumentException("Invalid initial data line");
             }
 
             String id = parts[1];
@@ -115,8 +115,8 @@ public class StorageInitializationPostProcessor implements BeanPostProcessor {
               break;
             }
             if (parts.length != 8) {
-              log.warn("Invalid initial data line for training: {}", line);
-              throw new IllegalArgumentException("Invalid initial data line: " + line);
+              log.warn("Invalid initial data line for training");
+              throw new IllegalArgumentException("Invalid initial data line");
             }
 
             String id = parts[1];
