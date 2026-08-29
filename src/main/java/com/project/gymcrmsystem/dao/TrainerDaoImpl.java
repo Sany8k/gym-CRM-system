@@ -51,7 +51,7 @@ public class TrainerDaoImpl implements TrainerDao {
     long id = sequence.incrementAndGet();
     trainer.assignId(id);
     storage.put(id, trainer);
-    log.info("Trainer saved with id={} and username={}",
+    log.debug("Trainer saved with id={} and username={}",
         trainer.getId(), trainer.getUsername());
     return trainer;
   }
@@ -65,7 +65,7 @@ public class TrainerDaoImpl implements TrainerDao {
       throw new IllegalArgumentException("Trainer not found.");
     }
     storage.replace(trainer.getId(), trainer);
-    log.info("Trainer updated with id={} and username={}",
+    log.debug("Trainer updated with id={} and username={}",
         trainer.getId(), trainer.getUsername());
     return trainer;
   }

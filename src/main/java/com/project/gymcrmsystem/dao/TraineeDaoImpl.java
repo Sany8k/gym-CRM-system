@@ -52,7 +52,7 @@ public class TraineeDaoImpl implements TraineeDao {
     long id = sequence.incrementAndGet();
     trainee.assignId(id);
     storage.put(id, trainee);
-    log.info("Trainee saved with id={} and username={}",
+    log.debug("Trainee saved with id={} and username={}",
         trainee.getId(), trainee.getUsername());
     return trainee;
   }
@@ -66,7 +66,7 @@ public class TraineeDaoImpl implements TraineeDao {
       throw new IllegalArgumentException("Trainee not found.");
     }
     storage.replace(trainee.getId(), trainee);
-    log.info("Trainee updated with id={} and username={}",
+    log.debug("Trainee updated with id={} and username={}",
         trainee.getId(), trainee.getUsername());
     return trainee;
   }

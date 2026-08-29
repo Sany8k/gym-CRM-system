@@ -36,7 +36,7 @@ public class TrainingDaoImpl implements TrainingDao {
     long id = sequence.incrementAndGet();
     training.assignId(id);
     storage.put(id, training);
-    log.info("Training saved with id={} and traineeId={} and trainerId={}",
+    log.debug("Training saved with id={} and traineeId={} and trainerId={}",
         training.getId(), training.getTraineeId(), training.getTrainerId());
     return training;
   }
