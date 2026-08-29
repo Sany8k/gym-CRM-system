@@ -3,7 +3,6 @@ package com.project.gymcrmsystem.util;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -22,13 +21,5 @@ class PasswordGeneratorTest {
     assertNotNull(password);
     assertEquals(10, password.length());
     assertTrue(password.chars().allMatch(symbol -> ALLOWED_SYMBOLS.indexOf(symbol) >= 0));
-  }
-
-  @Test
-  void shouldNotGenerateEmptyOrInvalidPassword() {
-    String password = passwordGenerator.generateRandomPassword();
-
-    assertFalse(password.isEmpty());
-    assertFalse(password.chars().anyMatch(symbol -> ALLOWED_SYMBOLS.indexOf(symbol) < 0));
   }
 }

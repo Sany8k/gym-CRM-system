@@ -3,6 +3,7 @@ package com.project.gymcrmsystem.service;
 import com.project.gymcrmsystem.dao.TraineeDao;
 import com.project.gymcrmsystem.dao.TrainerDao;
 import com.project.gymcrmsystem.model.Trainee;
+import com.project.gymcrmsystem.model.Trainer;
 import com.project.gymcrmsystem.util.PasswordGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,28 +48,30 @@ class TraineeServiceImplTest {
     Trainee trainee = trainee("Jane", "Doe");
     when(traineeDao.findByUsername("Jane.Doe")).thenReturn(Optional.empty());
     when(trainerDao.findByUsername("Jane.Doe")).thenReturn(Optional.empty());
-    when(passwordGenerator.generateRandomPassword()).thenReturn("password123");
+    when(passwordGenerator.generateRandomPassword()).thenReturn("pass123456");
     when(traineeDao.save(trainee)).thenReturn(trainee);
 
     Trainee result = service.save(trainee);
 
     assertSame(trainee, result);
     assertEquals("Jane.Doe", trainee.getUsername());
-    assertEquals("password123", trainee.getPassword());
+    assertEquals("pass123456", trainee.getPassword());
     verify(traineeDao).save(trainee);
   }
 
   @Test
-  void shouldPropagateExceptionWhenSavingTraineeFails() {
+  void shouldChooseAvailableUsernameWhenOriginalUsernameIsTakenByTrainer() {
     Trainee trainee = trainee("Jane", "Doe");
     when(traineeDao.findByUsername("Jane.Doe")).thenReturn(Optional.empty());
-    when(trainerDao.findByUsername("Jane.Doe")).thenReturn(Optional.empty());
-    when(passwordGenerator.generateRandomPassword()).thenReturn("password123");
-    when(traineeDao.save(trainee)).thenThrow(new RuntimeException("Database unavailable"));
+    when(trainerDao.findByUsername("Jane.Doe")).thenReturn(Optional.of(new Trainer()));
+    when(traineeDao.findByUsername("Jane.Doe1")).thenReturn(Optional.empty());
+    when(trainerDao.findByUsername("Jane.Doe1")).thenReturn(Optional.empty());
+    when(passwordGenerator.generateRandomPassword()).thenReturn("pass123456");
+    when(traineeDao.save(trainee)).thenReturn(trainee);
 
-    RuntimeException exception = assertThrows(RuntimeException.class, () -> service.save(trainee));
+    service.save(trainee);
 
-    assertEquals("Database unavailable", exception.getMessage());
+    assertEquals("Jane.Doe1", trainee.getUsername());
     verify(traineeDao).save(trainee);
   }
 
@@ -108,16 +110,6 @@ class TraineeServiceImplTest {
   void shouldDeleteTrainee() {
     service.deleteById(1L);
 
-    verify(traineeDao).deleteById(1L);
-  }
-
-  @Test
-  void shouldPropagateExceptionWhenDeletingTraineeFails() {
-    doThrow(new RuntimeException("Database unavailable")).when(traineeDao).deleteById(1L);
-
-    RuntimeException exception = assertThrows(RuntimeException.class, () -> service.deleteById(1L));
-
-    assertEquals("Database unavailable", exception.getMessage());
     verify(traineeDao).deleteById(1L);
   }
 

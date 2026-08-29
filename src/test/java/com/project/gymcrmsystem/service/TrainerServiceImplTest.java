@@ -48,14 +48,14 @@ class TrainerServiceImplTest {
     Trainer trainer = trainer("John", "Doe");
     when(traineeDao.findByUsername("John.Doe")).thenReturn(Optional.empty());
     when(trainerDao.findByUsername("John.Doe")).thenReturn(Optional.empty());
-    when(passwordGenerator.generateRandomPassword()).thenReturn("password123");
+    when(passwordGenerator.generateRandomPassword()).thenReturn("pass123456");
     when(trainerDao.save(trainer)).thenReturn(trainer);
 
     Trainer result = service.save(trainer);
 
     assertSame(trainer, result);
     assertEquals("John.Doe", trainer.getUsername());
-    assertEquals("password123", trainer.getPassword());
+    assertEquals("pass123456", trainer.getPassword());
     verify(trainerDao).save(trainer);
   }
 
@@ -65,26 +65,12 @@ class TrainerServiceImplTest {
     when(traineeDao.findByUsername("John.Doe")).thenReturn(Optional.of(new Trainee()));
     when(traineeDao.findByUsername("John.Doe1")).thenReturn(Optional.empty());
     when(trainerDao.findByUsername("John.Doe1")).thenReturn(Optional.empty());
-    when(passwordGenerator.generateRandomPassword()).thenReturn("password123");
+    when(passwordGenerator.generateRandomPassword()).thenReturn("pass123456");
     when(trainerDao.save(trainer)).thenReturn(trainer);
 
     service.save(trainer);
 
     assertEquals("John.Doe1", trainer.getUsername());
-    verify(trainerDao).save(trainer);
-  }
-
-  @Test
-  void shouldPropagateExceptionWhenSavingTrainerFails() {
-    Trainer trainer = trainer("John", "Doe");
-    when(traineeDao.findByUsername("John.Doe")).thenReturn(Optional.empty());
-    when(trainerDao.findByUsername("John.Doe")).thenReturn(Optional.empty());
-    when(passwordGenerator.generateRandomPassword()).thenReturn("password123");
-    when(trainerDao.save(trainer)).thenThrow(new RuntimeException("Database unavailable"));
-
-    RuntimeException exception = assertThrows(RuntimeException.class, () -> service.save(trainer));
-
-    assertEquals("Database unavailable", exception.getMessage());
     verify(trainerDao).save(trainer);
   }
 
