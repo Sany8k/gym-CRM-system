@@ -4,6 +4,7 @@ import com.project.gymcrmsystem.dao.TraineeDao;
 import com.project.gymcrmsystem.dao.TrainerDao;
 import com.project.gymcrmsystem.model.Trainer;
 import com.project.gymcrmsystem.util.PasswordGenerator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class TrainerServiceImpl implements TrainerService {
   private TrainerDao trainerDao;
   private TraineeDao traineeDao;
@@ -43,6 +45,7 @@ public class TrainerServiceImpl implements TrainerService {
 
   @Override
   public Trainer save(Trainer trainer) {
+    log.debug("Creating new trainer for {} {}", trainer.getFirstName(), trainer.getLastName());
     String username = trainer.getFirstName() + "." + trainer.getLastName();
     int counter = 1;
     String originalUsername = username;
@@ -52,15 +55,21 @@ public class TrainerServiceImpl implements TrainerService {
     }
     trainer.setUsername(username);
     trainer.setPassword(passwordGenerator.generateRandomPassword());
+    log.info("Trainer created with id={} and username={}", trainer.getId(), trainer.getUsername());
     return trainerDao.save(trainer);
   }
 
   @Override
   public Trainer update(Trainer trainer) {
+    log.debug("Updating trainer with id={}", trainer.getId());
     Trainer existing = trainerDao.findById(trainer.getId())
-        .orElseThrow(() -> new IllegalArgumentException("Trainer not found"));
+        .orElseThrow(() -> {
+          log.warn("Trainer with id={} not found", trainer.getId());
+          return new IllegalArgumentException("Trainer not found");
+        });
     trainer.setUsername(existing.getUsername());
     trainer.setPassword(existing.getPassword());
+    log.info("Trainer updated with id={} and username={}", trainer.getId(), trainer.getUsername());
     return trainerDao.update(trainer);
   }
 

@@ -4,6 +4,7 @@ import com.project.gymcrmsystem.model.Trainee;
 import com.project.gymcrmsystem.model.Trainer;
 import com.project.gymcrmsystem.model.Training;
 import com.project.gymcrmsystem.model.TrainingType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.io.Resource;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class StorageInitializationPostProcessor implements BeanPostProcessor {
 
   @Value("${storage.data.file}")
@@ -35,13 +37,16 @@ public class StorageInitializationPostProcessor implements BeanPostProcessor {
       String line;
 
       while ((line = reader.readLine()) != null) {
+        log.debug("Creating initial data for bean {} from line: {}", beanName, line);
         String[] parts = line.split("\\|", -1);
         switch (beanName) {
           case "traineeStorage": {
             if (!"TRAINEE".equals(parts[0])) {
               break;
             }
+            log.debug("Processing trainee data: {}", line);
             if (parts.length != 9) {
+              log.warn("Invalid initial data line for trainee: {}", line);
               throw new IllegalArgumentException("Invalid initial data line: " + line);
             }
 
@@ -74,7 +79,9 @@ public class StorageInitializationPostProcessor implements BeanPostProcessor {
             if (!"TRAINER".equals(parts[0])) {
               break;
             }
+            log.debug("Processing trainer data: {}", line);
             if (parts.length != 8) {
+              log.warn("Invalid initial data line for trainer: {}", line);
               throw new IllegalArgumentException("Invalid initial data line: " + line);
             }
 
@@ -100,6 +107,7 @@ public class StorageInitializationPostProcessor implements BeanPostProcessor {
             @SuppressWarnings("unchecked")
             Map<Long, Trainer> storage = (Map<Long, Trainer>) bean;
             storage.put(trainer.getId(), trainer);
+            log.info("Trainer saved with id={} and username={}", trainer.getId(), trainer.getUsername());
             break;
           }
           case "trainingStorage": {
@@ -107,6 +115,7 @@ public class StorageInitializationPostProcessor implements BeanPostProcessor {
               break;
             }
             if (parts.length != 8) {
+              log.warn("Invalid initial data line for training: {}", line);
               throw new IllegalArgumentException("Invalid initial data line: " + line);
             }
 
@@ -131,12 +140,17 @@ public class StorageInitializationPostProcessor implements BeanPostProcessor {
 
             @SuppressWarnings("unchecked")
             Map<Long, Training> storage = (Map<Long, Training>) bean;
+            log.debug("Saving training with id={} and traineeId={} and trainerId={}",
+                training.getId(), training.getTraineeId(), training.getTrainerId());
             storage.put(training.getId(), training);
+            log.info("Training saved with id={} and traineeId={} and trainerId={}",
+                training.getId(), training.getTraineeId(), training.getTrainerId());
             break;
           }
           }
       }
     } catch (IOException e) {
+      log.warn("Failed to initialize storage from {}: {}", dataFile, e.getMessage());
       throw new IllegalStateException("Failed to initialize storage from " + dataFile, e);
     }
     return bean;

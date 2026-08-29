@@ -1,6 +1,7 @@
 package com.project.gymcrmsystem.dao;
 
 import com.project.gymcrmsystem.model.Trainer;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
+@Slf4j
 public class TrainerDaoImpl implements TrainerDao {
   private Map<Long, Trainer> storage;
   private AtomicLong sequence;
@@ -44,18 +46,27 @@ public class TrainerDaoImpl implements TrainerDao {
 
   @Override
   public Trainer save(Trainer trainer) {
+    log.debug("Saving trainer with firstName={} and lastName={}",
+        trainer.getFirstName(), trainer.getLastName());
     long id = sequence.incrementAndGet();
     trainer.assignId(id);
     storage.put(id, trainer);
+    log.info("Trainer saved with id={} and username={}",
+        trainer.getId(), trainer.getUsername());
     return trainer;
   }
 
   @Override
   public Trainer update(Trainer trainer) {
+    log.debug("Updating trainer with id={} and username={}",
+        trainer.getId(), trainer.getUsername());
     if (!storage.containsKey(trainer.getId())) {
+      log.warn("Trainer with id={} not found", trainer.getId());
       throw new IllegalArgumentException("Trainer not found.");
     }
     storage.replace(trainer.getId(), trainer);
+    log.info("Trainer updated with id={} and username={}",
+        trainer.getId(), trainer.getUsername());
     return trainer;
   }
 }

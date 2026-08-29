@@ -1,6 +1,7 @@
 package com.project.gymcrmsystem.dao;
 
 import com.project.gymcrmsystem.model.Trainee;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
+@Slf4j
 public class TraineeDaoImpl implements TraineeDao {
 
   private Map<Long, Trainee> storage;
@@ -45,23 +47,33 @@ public class TraineeDaoImpl implements TraineeDao {
 
   @Override
   public Trainee save(Trainee trainee) {
+    log.debug("Saving trainee with firstName={} and lastName={}",
+        trainee.getFirstName(), trainee.getLastName());
     long id = sequence.incrementAndGet();
     trainee.assignId(id);
     storage.put(id, trainee);
+    log.info("Trainee saved with id={} and username={}",
+        trainee.getId(), trainee.getUsername());
     return trainee;
   }
 
   @Override
   public Trainee update(Trainee trainee) {
+    log.debug("Updating trainee with id={} and username={}",
+        trainee.getId(), trainee.getUsername());
     if (!storage.containsKey(trainee.getId())) {
+      log.warn("Trainee with id={} not found", trainee.getId());
       throw new IllegalArgumentException("Trainee not found.");
     }
     storage.replace(trainee.getId(), trainee);
+    log.info("Trainee updated with id={} and username={}",
+        trainee.getId(), trainee.getUsername());
     return trainee;
   }
 
   @Override
   public void deleteById(Long id) {
+    log.debug("Deleting trainee with id={}", id);
     storage.remove(id);
   }
 }
