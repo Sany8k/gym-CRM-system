@@ -1,27 +1,33 @@
 package com.project.gymcrmsystem.model;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
+@Table(name = "user")
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class User {
 
-  @Setter(value = AccessLevel.NONE)
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(nullable = false)
   private String firstName;
+
+  @Column(nullable = false)
   private String lastName;
+
+  @Column(nullable = false, unique = true)
   private String username;
+
+  @Column(nullable = false)
   private String password;
+
+  @Column(nullable = false)
   private boolean active;
-
-  public void assignId(Long id) {
-    if (this.id != null) {
-      throw new IllegalStateException("ID has already been assigned and cannot be changed.");
-    }
-
-    this.id = id;
-  }
 }

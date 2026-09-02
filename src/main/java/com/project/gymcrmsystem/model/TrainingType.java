@@ -1,15 +1,20 @@
 package com.project.gymcrmsystem.model;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
+@Table(name = "training_types")
 public class TrainingType {
 
-  @Setter(value = AccessLevel.NONE)
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(nullable = false, unique = true)
   private String name;
 }
