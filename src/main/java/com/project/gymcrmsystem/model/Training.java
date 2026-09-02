@@ -21,7 +21,7 @@ public class Training {
   private Trainee trainee;
 
   @ManyToOne
-    @JoinColumn(name = "trainer_id", nullable = false)
+  @JoinColumn(name = "trainer_id", nullable = false)
   private Trainer trainer;
 
   @Column(nullable = false)
