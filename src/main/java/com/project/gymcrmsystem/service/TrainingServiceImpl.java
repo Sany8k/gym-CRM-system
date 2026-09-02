@@ -40,21 +40,21 @@ public class TrainingServiceImpl implements TrainingService {
   @Override
   public Training save(Training training) {
     log.debug("Creating new training for traineeId={} and trainerId={}",
-        training.getTraineeId(), training.getTrainerId());
-    if (traineeDao.findById(training.getTraineeId()).isEmpty()) {
-      log.warn("Trainee with id={} not found", training.getTraineeId());
+        training.getTrainee().getId(), training.getTrainer().getId());
+    if (traineeDao.findById(training.getTrainee().getId()).isEmpty()) {
+      log.warn("Trainee with id={} not found", training.getTrainee().getId());
       throw new IllegalArgumentException("Trainee not found");
     }
 
-    if (trainerDao.findById(training.getTrainerId()).isEmpty()) {
-      log.warn("Trainer with id={} not found", training.getTrainerId());
+    if (trainerDao.findById(training.getTrainer().getId()).isEmpty()) {
+      log.warn("Trainer with id={} not found", training.getTrainer().getId());
       throw new IllegalArgumentException("Trainer not found");
     }
 
     Training saved = trainingDao.save(training);
 
     log.info("Training created with id={} and traineeId={} and trainerId={}",
-        saved.getId(), saved.getTraineeId(), saved.getTrainerId());
+        saved.getId(), saved.getTrainee().getId(), saved.getTrainer().getId());
 
     return saved;
   }

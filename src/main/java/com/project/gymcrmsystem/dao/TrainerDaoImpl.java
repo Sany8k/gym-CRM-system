@@ -1,72 +1,67 @@
 package com.project.gymcrmsystem.dao;
 
 import com.project.gymcrmsystem.model.Trainer;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 @Slf4j
 public class TrainerDaoImpl implements TrainerDao {
-  private Map<Long, Trainer> storage;
-  private AtomicLong sequence;
 
-  @Autowired
-  public void setStorage(@Qualifier("trainerStorage") Map<Long, Trainer> storage) {
-    this.storage = storage;
-    long maxId = storage.keySet().stream().mapToLong(Long::longValue).max().orElse(0L);
-    this.sequence = new AtomicLong(maxId);
-  }
+  @PersistenceContext
+  private EntityManager em;
 
   @Override
   public List<Trainer> findAll() {
-    return List.copyOf(storage.values());
+    TypedQuery<Trainer> query = em.createQuery("SELECT t FROM Trainer t",
+            Trainer.class);
+    return query.getResultList();
   }
 
   @Override
   public Optional<Trainer> findById(Long id) {
-    return Optional.ofNullable(storage.get(id));
+    return Optional.ofNullable(em.find(Trainer.class, id));
   }
 
   @Override
   public Optional<Trainer> findByUsername(String username) {
-    for (Trainer trainer : storage.values()) {
-      if (trainer.getUsername().equals(username)) {
-        return Optional.of(trainer);
-      }
+    TypedQuery<Trainer> query = em.createQuery("SELECT t FROM Trainer t WHERE t.username = :username",
+            Trainer.class);
+    query.setParameter("username", username);
+    List<Trainer> results = query.getResultList();
+    if (results.isEmpty()) {
+      return Optional.empty();
     }
-    return Optional.empty();
+    return Optional.of(results.getFirst());
   }
 
   @Override
   public Trainer save(Trainer trainer) {
     log.debug("Saving trainer with firstName={} and lastName={}",
         trainer.getFirstName(), trainer.getLastName());
-    long id = sequence.incrementAndGet();
-    trainer.assignId(id);
-    storage.put(id, trainer);
+    Trainer savedTrainer = em.merge(trainer);
     log.debug("Trainer saved with id={} and username={}",
-        trainer.getId(), trainer.getUsername());
-    return trainer;
+        savedTrainer.getId(), savedTrainer.getUsername());
+    return savedTrainer;
   }
 
   @Override
   public Trainer update(Trainer trainer) {
     log.debug("Updating trainer with id={} and username={}",
         trainer.getId(), trainer.getUsername());
-    if (!storage.containsKey(trainer.getId())) {
+    if (em.find(Trainer.class, trainer.getId()) == null) {
       log.warn("Trainer with id={} not found", trainer.getId());
       throw new IllegalArgumentException("Trainer not found.");
     }
-    storage.replace(trainer.getId(), trainer);
+     Trainer updatedTrainer = em.merge(trainer);
     log.debug("Trainer updated with id={} and username={}",
-        trainer.getId(), trainer.getUsername());
-    return trainer;
+        updatedTrainer.getId(), updatedTrainer.getUsername());
+    return updatedTrainer;
   }
 }

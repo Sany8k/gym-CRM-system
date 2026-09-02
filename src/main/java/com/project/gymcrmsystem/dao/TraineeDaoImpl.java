@@ -1,79 +1,72 @@
 package com.project.gymcrmsystem.dao;
 
 import com.project.gymcrmsystem.model.Trainee;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
 @Slf4j
 public class TraineeDaoImpl implements TraineeDao {
 
-  private Map<Long, Trainee> storage;
-  private AtomicLong sequence;
-
-  @Autowired
-  public void setStorage(@Qualifier("traineeStorage") Map<Long, Trainee> storage) {
-    this.storage = storage;
-    long maxId = storage.keySet().stream().mapToLong(Long::longValue).max().orElse(0L);
-    this.sequence = new AtomicLong(maxId);
-  }
+  @PersistenceContext
+  private EntityManager em;
 
   @Override
   public List<Trainee> findAll() {
-    return List.copyOf(storage.values());
+    TypedQuery<Trainee> query = em.createQuery("SELECT t FROM Trainee t", Trainee.class);
+    return query.getResultList();
   }
 
   @Override
   public Optional<Trainee> findById(Long id) {
-    return Optional.ofNullable(storage.get(id));
+    return Optional.ofNullable(em.find(Trainee.class, id));
   }
 
   @Override
   public Optional<Trainee> findByUsername(String username) {
-    for (Trainee trainee : storage.values()) {
-      if (trainee.getUsername().equals(username)) {
-        return Optional.of(trainee);
-      }
+    TypedQuery<Trainee> query = em.createQuery("SELECT t FROM Trainee t WHERE t.username = :username",
+            Trainee.class);
+    query.setParameter("username", username);
+    List<Trainee> results = query.getResultList();
+    if (results.isEmpty()) {
+      return Optional.empty();
     }
-    return Optional.empty();
+    return Optional.of(results.getFirst());
   }
 
   @Override
   public Trainee save(Trainee trainee) {
     log.debug("Saving trainee with firstName={} and lastName={}",
         trainee.getFirstName(), trainee.getLastName());
-    long id = sequence.incrementAndGet();
-    trainee.assignId(id);
-    storage.put(id, trainee);
+    Trainee savedTrainee = em.merge(trainee);
     log.debug("Trainee saved with id={} and username={}",
-        trainee.getId(), trainee.getUsername());
-    return trainee;
+        savedTrainee.getId(), savedTrainee.getUsername());
+    return savedTrainee;
   }
 
   @Override
   public Trainee update(Trainee trainee) {
     log.debug("Updating trainee with id={} and username={}",
         trainee.getId(), trainee.getUsername());
-    if (!storage.containsKey(trainee.getId())) {
+    if (!em.contains(trainee)) {
       log.warn("Trainee with id={} not found", trainee.getId());
       throw new IllegalArgumentException("Trainee not found.");
     }
-    storage.replace(trainee.getId(), trainee);
+     Trainee savedTrainee = em.merge(trainee);
     log.debug("Trainee updated with id={} and username={}",
-        trainee.getId(), trainee.getUsername());
-    return trainee;
+        savedTrainee.getId(), savedTrainee.getUsername());
+    return savedTrainee;
   }
 
   @Override
   public void deleteById(Long id) {
     log.debug("Deleting trainee with id={}", id);
-    storage.remove(id);
+    em.remove(em.find(Trainee.class, id));
   }
 }
