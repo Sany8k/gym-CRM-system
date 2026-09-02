@@ -44,9 +44,12 @@ public class TraineeDaoImpl implements TraineeDao {
   public Trainee save(Trainee trainee) {
     log.debug("Saving trainee with firstName={} and lastName={}",
         trainee.getFirstName(), trainee.getLastName());
+
     em.persist(trainee);
+
     log.debug("Trainee saved with id={} and username={}",
         trainee.getId(), trainee.getUsername());
+
     return trainee;
   }
 
@@ -54,19 +57,31 @@ public class TraineeDaoImpl implements TraineeDao {
   public Trainee update(Trainee trainee) {
     log.debug("Updating trainee with id={} and username={}",
         trainee.getId(), trainee.getUsername());
+
     if (em.find(Trainee.class, trainee.getId()) == null) {
       log.warn("Trainee with id={} not found", trainee.getId());
       throw new IllegalArgumentException("Trainee not found.");
     }
-     Trainee savedTrainee = em.merge(trainee);
+
+    Trainee savedTrainee = em.merge(trainee);
+
     log.debug("Trainee updated with id={} and username={}",
         savedTrainee.getId(), savedTrainee.getUsername());
+
     return savedTrainee;
   }
 
   @Override
   public void deleteById(Long id) {
     log.debug("Deleting trainee with id={}", id);
-    em.remove(em.find(Trainee.class, id));
+
+    Trainee trainee = em.find(Trainee.class, id);
+
+    if (trainee == null) {
+      log.warn("Trainee with id={} not found", id);
+      throw new IllegalArgumentException("Trainee not found.");
+    }
+
+    em.remove(trainee);
   }
 }

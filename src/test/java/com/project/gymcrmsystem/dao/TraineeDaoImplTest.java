@@ -12,6 +12,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -102,9 +103,10 @@ class TraineeDaoImplTest {
   void shouldLeaveOtherTraineesWhenDeletingUnknownId() {
     when(entityManager.find(Trainee.class, 99L)).thenReturn(null);
 
-    dao.deleteById(99L);
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> dao.deleteById(99L));
 
-    verify(entityManager).remove(null);
+    assertEquals("Trainee not found.", exception.getMessage());
+    verify(entityManager, never()).remove(any());
   }
 
   private Trainee trainee(String firstName, String lastName, String username) {
