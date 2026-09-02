@@ -1,7 +1,6 @@
 package com.project.gymcrmsystem.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -28,7 +26,7 @@ public class Trainee extends User {
   )
   private Set<Trainer> trainers = new HashSet<>();
 
-  @OneToMany(mappedBy = "traineeId", cascade = CascadeType.REMOVE)
+  @OneToMany(mappedBy = "trainee", cascade = CascadeType.REMOVE)
   private List<Training> trainings = new ArrayList<>();
 
   @Column

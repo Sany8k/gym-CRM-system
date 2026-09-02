@@ -4,11 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "user")
+@Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class User {
 

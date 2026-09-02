@@ -6,7 +6,6 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -19,11 +18,11 @@ public class Training {
 
   @ManyToOne
     @JoinColumn(name = "trainee_id", nullable = false)
-  private Trainee traineeId;
+  private Trainee trainee;
 
   @ManyToOne
     @JoinColumn(name = "trainer_id", nullable = false)
-  private Trainer trainerId;
+  private Trainer trainer;
 
   @Column(nullable = false)
   private String name;
