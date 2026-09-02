@@ -45,10 +45,10 @@ public class TrainerDaoImpl implements TrainerDao {
   public Trainer save(Trainer trainer) {
     log.debug("Saving trainer with firstName={} and lastName={}",
         trainer.getFirstName(), trainer.getLastName());
-    Trainer savedTrainer = em.merge(trainer);
+    em.persist(trainer);
     log.debug("Trainer saved with id={} and username={}",
-        savedTrainer.getId(), savedTrainer.getUsername());
-    return savedTrainer;
+        trainer.getId(), trainer.getUsername());
+    return trainer;
   }
 
   @Override

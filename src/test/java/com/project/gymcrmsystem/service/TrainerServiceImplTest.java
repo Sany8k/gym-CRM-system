@@ -77,11 +77,11 @@ class TrainerServiceImplTest {
   @Test
   void shouldUpdateTrainerAndKeepExistingCredentials() {
     Trainer existing = trainer("Old", "Name");
-    existing.assignId(1L);
+    existing.setId(1L);
     existing.setUsername("old.name");
     existing.setPassword("old-password");
     Trainer changed = trainer("New", "Name");
-    changed.assignId(1L);
+    changed.setId(1L);
     when(trainerDao.findById(1L)).thenReturn(Optional.of(existing));
     when(trainerDao.update(changed)).thenReturn(changed);
 
@@ -96,7 +96,7 @@ class TrainerServiceImplTest {
   @Test
   void shouldNotUpdateTrainerWhenItDoesNotExist() {
     Trainer trainer = trainer("John", "Doe");
-    trainer.assignId(1L);
+    trainer.setId(1L);
     when(trainerDao.findById(1L)).thenReturn(Optional.empty());
 
     IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> service.update(trainer));

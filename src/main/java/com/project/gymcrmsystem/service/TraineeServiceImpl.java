@@ -7,6 +7,7 @@ import com.project.gymcrmsystem.util.PasswordGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +45,7 @@ public class TraineeServiceImpl implements TraineeService {
   }
 
   @Override
+  @Transactional
   public Trainee save(Trainee trainee) {
     log.debug("Creating new trainee for {} {}", trainee.getFirstName(), trainee.getLastName());
     String username = trainee.getFirstName() + "." + trainee.getLastName();
@@ -63,6 +65,7 @@ public class TraineeServiceImpl implements TraineeService {
   }
 
   @Override
+  @Transactional
   public Trainee update(Trainee trainee) {
     log.debug("Updating trainee with id={}", trainee.getId());
     Trainee existing = traineeDao.findById(trainee.getId())
@@ -82,6 +85,7 @@ public class TraineeServiceImpl implements TraineeService {
   }
 
   @Override
+  @Transactional
   public void deleteById(Long id) {
     log.info("Deleting trainee with id={}", id);
     traineeDao.deleteById(id);

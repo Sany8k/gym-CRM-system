@@ -7,6 +7,7 @@ import com.project.gymcrmsystem.util.PasswordGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +45,7 @@ public class TrainerServiceImpl implements TrainerService {
   }
 
   @Override
+  @Transactional
   public Trainer save(Trainer trainer) {
     log.debug("Creating new trainer for {} {}", trainer.getFirstName(), trainer.getLastName());
     String username = trainer.getFirstName() + "." + trainer.getLastName();
@@ -64,6 +66,7 @@ public class TrainerServiceImpl implements TrainerService {
   }
 
   @Override
+  @Transactional
   public Trainer update(Trainer trainer) {
     log.debug("Updating trainer with id={}", trainer.getId());
     Trainer existing = trainerDao.findById(trainer.getId())

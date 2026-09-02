@@ -44,17 +44,17 @@ public class TraineeDaoImpl implements TraineeDao {
   public Trainee save(Trainee trainee) {
     log.debug("Saving trainee with firstName={} and lastName={}",
         trainee.getFirstName(), trainee.getLastName());
-    Trainee savedTrainee = em.merge(trainee);
+    em.persist(trainee);
     log.debug("Trainee saved with id={} and username={}",
-        savedTrainee.getId(), savedTrainee.getUsername());
-    return savedTrainee;
+        trainee.getId(), trainee.getUsername());
+    return trainee;
   }
 
   @Override
   public Trainee update(Trainee trainee) {
     log.debug("Updating trainee with id={} and username={}",
         trainee.getId(), trainee.getUsername());
-    if (!em.contains(trainee)) {
+    if (em.find(Trainee.class, trainee.getId()) == null) {
       log.warn("Trainee with id={} not found", trainee.getId());
       throw new IllegalArgumentException("Trainee not found.");
     }

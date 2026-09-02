@@ -7,6 +7,7 @@ import com.project.gymcrmsystem.model.Training;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -38,6 +39,7 @@ public class TrainingServiceImpl implements TrainingService {
   }
 
   @Override
+  @Transactional
   public Training save(Training training) {
     log.debug("Creating new training for traineeId={} and trainerId={}",
         training.getTrainee().getId(), training.getTrainer().getId());

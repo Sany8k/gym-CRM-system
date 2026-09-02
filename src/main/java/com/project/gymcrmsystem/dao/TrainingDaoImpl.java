@@ -24,9 +24,9 @@ public class TrainingDaoImpl implements TrainingDao {
   public Training save(Training training) {
     log.debug("Saving training with traineeId={} and trainerId={}",
         training.getTrainee().getId(), training.getTrainer().getId());
-     Training savedTraining = em.merge(training);
+     em.persist(training);
     log.debug("Training saved with id={} and traineeId={} and trainerId={}",
-        savedTraining.getId(), savedTraining.getTrainee().getId(), savedTraining.getTrainer().getId());
-    return savedTraining;
+        training.getId(), training.getTrainee().getId(), training.getTrainer().getId());
+    return training;
   }
 }

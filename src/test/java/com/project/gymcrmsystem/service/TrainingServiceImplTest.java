@@ -9,7 +9,6 @@ import com.project.gymcrmsystem.model.Training;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.Assertions.*;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
@@ -42,9 +41,7 @@ class TrainingServiceImplTest {
 
   @Test
   void shouldSaveTrainingWhenTraineeAndTrainerExist() {
-    Training training = new Training();
-    training.setTraineeId(1L);
-    training.setTrainerId(2L);
+    Training training = training(1L, 2L);
 
     when(traineeDao.findById(1L))
         .thenReturn(Optional.of(new Trainee()));
@@ -63,9 +60,7 @@ class TrainingServiceImplTest {
 
   @Test
   void shouldThrowExceptionWhenTraineeDoesNotExist() {
-    Training training = new Training();
-    training.setTraineeId(1L);
-    training.setTrainerId(2L);
+    Training training = training(1L, 2L);
 
     when(traineeDao.findById(1L))
         .thenReturn(Optional.empty());
@@ -78,9 +73,7 @@ class TrainingServiceImplTest {
 
   @Test
   void shouldThrowExceptionWhenTrainerDoesNotExist() {
-    Training training = new Training();
-    training.setTraineeId(1L);
-    training.setTrainerId(2L);
+    Training training = training(1L, 2L);
 
     when(traineeDao.findById(1L))
         .thenReturn(Optional.of(new Trainee()));
@@ -92,5 +85,16 @@ class TrainingServiceImplTest {
         () -> service.save(training));
 
     verify(trainingDao, never()).save(any());
+  }
+
+  private Training training(Long traineeId, Long trainerId) {
+    Trainee trainee = new Trainee();
+    trainee.setId(traineeId);
+    Trainer trainer = new Trainer();
+    trainer.setId(trainerId);
+    Training training = new Training();
+    training.setTrainee(trainee);
+    training.setTrainer(trainer);
+    return training;
   }
 }
