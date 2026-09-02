@@ -152,6 +152,28 @@ class TraineeServiceImplTest {
   }
 
   @Test
+  void shouldAuthenticateTraineeWithValidCredentials() {
+    Trainee trainee = trainee("Jane", "Doe");
+    trainee.setPassword("valid-password");
+    when(traineeDao.findByUsername("jane.doe")).thenReturn(Optional.of(trainee));
+
+    boolean authenticated = service.authenticate("jane.doe", "valid-password");
+
+    assertTrue(authenticated);
+  }
+
+  @Test
+  void shouldNotAuthenticateTraineeWithInvalidCredentials() {
+    Trainee trainee = trainee("Jane", "Doe");
+    trainee.setPassword("valid-password");
+    when(traineeDao.findByUsername("jane.doe")).thenReturn(Optional.of(trainee));
+
+    boolean authenticated = service.authenticate("jane.doe", "wrong-password");
+
+    assertFalse(authenticated);
+  }
+
+  @Test
   void shouldRejectTraineePasswordShorterThanTenCharacters() {
     Trainee trainee = trainee("Jane", "Doe");
     trainee.setUsername("jane.doe");

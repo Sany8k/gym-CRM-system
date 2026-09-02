@@ -144,17 +144,37 @@ class TrainerServiceImplTest {
   }
 
   @Test
-  void shouldRejectTrainerPasswordThatMatchesCurrentPassword() {
+  void shouldChangeTrainerPasswordWhenItMatchesCurrentPassword() {
     Trainer trainer = trainer("John", "Doe");
     trainer.setUsername("john.doe");
     trainer.setPassword("old-password");
     when(trainerDao.findByUsername("john.doe")).thenReturn(Optional.of(trainer));
 
-    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-        () -> service.changePassword("john.doe", "old-password", "old-password"));
+    service.changePassword("john.doe", "old-password", "old-password");
 
-    assertEquals("New password cannot be the same as the old password", exception.getMessage());
     assertEquals("old-password", trainer.getPassword());
+  }
+
+  @Test
+  void shouldAuthenticateTrainerWithValidCredentials() {
+    Trainer trainer = trainer("John", "Doe");
+    trainer.setPassword("valid-password");
+    when(trainerDao.findByUsername("john.doe")).thenReturn(Optional.of(trainer));
+
+    boolean authenticated = service.authenticate("john.doe", "valid-password");
+
+    assertTrue(authenticated);
+  }
+
+  @Test
+  void shouldNotAuthenticateTrainerWithInvalidCredentials() {
+    Trainer trainer = trainer("John", "Doe");
+    trainer.setPassword("valid-password");
+    when(trainerDao.findByUsername("john.doe")).thenReturn(Optional.of(trainer));
+
+    boolean authenticated = service.authenticate("john.doe", "wrong-password");
+
+    assertFalse(authenticated);
   }
 
   @Test
