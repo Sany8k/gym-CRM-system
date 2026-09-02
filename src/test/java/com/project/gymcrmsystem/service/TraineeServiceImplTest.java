@@ -11,11 +11,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -111,6 +114,83 @@ class TraineeServiceImplTest {
     service.deleteById(1L);
 
     verify(traineeDao).deleteById(1L);
+  }
+
+  @Test
+  void shouldReturnAllTrainees() {
+    List<Trainee> trainees = List.of(trainee("Jane", "Doe"), trainee("John", "Doe"));
+    when(traineeDao.findAll()).thenReturn(trainees);
+
+    List<Trainee> result = service.findAll();
+
+    assertSame(trainees, result);
+    verify(traineeDao).findAll();
+  }
+
+  @Test
+  void shouldFindTraineeById() {
+    Trainee trainee = trainee("Jane", "Doe");
+    when(traineeDao.findById(1L)).thenReturn(Optional.of(trainee));
+
+    Optional<Trainee> result = service.findById(1L);
+
+    assertTrue(result.isPresent());
+    assertSame(trainee, result.orElseThrow());
+    verify(traineeDao).findById(1L);
+  }
+
+  @Test
+  void shouldChangeTraineePasswordWhenCredentialsAndPasswordAreValid() {
+    Trainee trainee = trainee("Jane", "Doe");
+    trainee.setUsername("jane.doe");
+    trainee.setPassword("old-password");
+    when(traineeDao.findByUsername("jane.doe")).thenReturn(Optional.of(trainee));
+
+    service.changePassword("jane.doe", "old-password", "new-password");
+
+    assertEquals("new-password", trainee.getPassword());
+  }
+
+  @Test
+  void shouldRejectTraineePasswordShorterThanTenCharacters() {
+    Trainee trainee = trainee("Jane", "Doe");
+    trainee.setUsername("jane.doe");
+    trainee.setPassword("old-password");
+    when(traineeDao.findByUsername("jane.doe")).thenReturn(Optional.of(trainee));
+
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        () -> service.changePassword("jane.doe", "old-password", "short"));
+
+    assertEquals("New Password must be at least 10 characters long", exception.getMessage());
+    assertEquals("old-password", trainee.getPassword());
+  }
+
+  @Test
+  void shouldToggleTraineeActiveStatusWhenCredentialsAreValid() {
+    Trainee trainee = trainee("Jane", "Doe");
+    trainee.setUsername("jane.doe");
+    trainee.setPassword("valid-password");
+    trainee.setActive(true);
+    when(traineeDao.findByUsername("jane.doe")).thenReturn(Optional.of(trainee));
+
+    service.toggleActive("jane.doe", "valid-password");
+
+    assertFalse(trainee.isActive());
+  }
+
+  @Test
+  void shouldNotToggleTraineeStatusWhenCredentialsAreInvalid() {
+    Trainee trainee = trainee("Jane", "Doe");
+    trainee.setUsername("jane.doe");
+    trainee.setPassword("valid-password");
+    trainee.setActive(true);
+    when(traineeDao.findByUsername("jane.doe")).thenReturn(Optional.of(trainee));
+
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        () -> service.toggleActive("jane.doe", "wrong-password"));
+
+    assertEquals("Invalid username or password", exception.getMessage());
+    assertTrue(trainee.isActive());
   }
 
   private Trainee trainee(String firstName, String lastName) {

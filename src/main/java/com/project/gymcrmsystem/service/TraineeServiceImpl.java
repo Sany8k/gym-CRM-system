@@ -84,6 +84,33 @@ public class TraineeServiceImpl implements TraineeService {
     return updated;
   }
 
+  @Transactional
+  @Override
+  public void changePassword(String username, String oldPassword, String newPassword) {
+    Trainee trainee = authenticateOrThrow(username, oldPassword);
+
+    if (!trainee.getPassword().equals(oldPassword)) {
+      throw new IllegalArgumentException("Old Password does not match");
+    }
+
+    if (!validatePassword(newPassword)) {
+      throw new IllegalArgumentException("New Password must be at least 10 characters long");
+    }
+
+    trainee.setPassword(newPassword);
+  }
+
+  @Transactional
+  @Override
+  public void toggleActive(String username, String password) {
+    log.debug("Toggleing trainee status for username={} to {}", username, password);
+    Trainee trainee = authenticateOrThrow(username, password);
+
+    trainee.setActive(!trainee.isActive());
+    log.info("Trainee with username={} is now {}", username, trainee.isActive());
+
+  }
+
   @Override
   @Transactional
   public void deleteById(Long id) {
@@ -93,5 +120,21 @@ public class TraineeServiceImpl implements TraineeService {
 
   private boolean isUsernameTaken(String username) {
     return traineeDao.findByUsername(username).isPresent() || trainerDao.findByUsername(username).isPresent();
+  }
+
+  private Trainee authenticateOrThrow(String username, String password) {
+    if (authenticate(username, password)) {
+      throw new IllegalArgumentException("Invalid username or password");
+    }
+    return traineeDao.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Trainee not found"));
+  }
+
+  private boolean authenticate(String username, String password) {
+    Optional<Trainee> trainee = traineeDao.findByUsername(username);
+    return trainee.map(value -> value.getPassword().equals(password)).orElse(false);
+  }
+
+  private boolean validatePassword(String password) {
+    return password != null &&  !password.isBlank() && password.length() >= 10;
   }
 }

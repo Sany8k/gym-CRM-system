@@ -83,7 +83,57 @@ public class TrainerServiceImpl implements TrainerService {
     return updated;
   }
 
+  @Override
+  @Transactional
+  public void changePassword(String username, String oldPassword, String newPassword) {
+    log.debug("Changing password for trainer with username={}", username);
+    Trainer trainer = authenticateAndThrow(username, oldPassword);
+
+    if (!trainer.getPassword().equals(newPassword)) {
+      log.warn("New password cannot be the same as the old password for trainer with username={}", username);
+      throw new IllegalArgumentException("New password cannot be the same as the old password");
+    }
+
+    if (!validatePassword(newPassword)) {
+      log.warn("New password does not meet the requirements for trainer with username={}", username);
+      throw new IllegalArgumentException("New password does not meet the requirements");
+    }
+
+    trainer.setPassword(newPassword);
+    log.info("Password changed for trainer with username={}", username);
+  }
+
+  @Override
+  @Transactional
+  public void toggleActive(String username, String password) {
+    log.debug("Toggling active status for trainer with username={}", username);
+    Trainer trainer = authenticateAndThrow(username, password);
+    trainer.setActive(!trainer.isActive());
+    log.info("Active status toggled for trainer with username={} to {}", username, trainer.isActive());
+  }
+
   private boolean isUsernameTaken(String username) {
     return traineeDao.findByUsername(username).isPresent() || trainerDao.findByUsername(username).isPresent();
+  }
+
+  private boolean authenticate(String username, String password) {
+    Optional<Trainer> trainer = trainerDao.findByUsername(username);
+      return trainer.map(value -> value.getPassword().equals(password)).orElse(false);
+  }
+
+  private Trainer authenticateAndThrow(String username, String password) {
+    if (authenticate(username, password)) {
+      return trainerDao.findByUsername(username)
+          .orElseThrow(() -> {
+            log.warn("Trainer with username={} not found", username);
+            return new IllegalArgumentException("Trainer not found");
+          });
+    } else {
+      throw new IllegalArgumentException("Invalid username or password");
+    }
+  }
+
+  private boolean validatePassword(String password) {
+    return password != null && !password.isBlank() && password.length() >= 10;
   }
 }

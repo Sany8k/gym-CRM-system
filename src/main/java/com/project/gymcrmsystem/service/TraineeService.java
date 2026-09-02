@@ -10,5 +10,7 @@ public interface TraineeService {
   Optional<Trainee> findById(Long id);
   Trainee save(Trainee trainee);
   Trainee update(Trainee trainee);
+  void changePassword(String username, String oldPassword, String newPassword);
+  void toggleActive(String username, String password);
   void deleteById(Long id);
 }

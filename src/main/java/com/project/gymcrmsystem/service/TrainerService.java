@@ -10,4 +10,6 @@ public interface TrainerService {
   Optional<Trainer> findById(Long id);
   Trainer save(Trainer trainer);
   Trainer update(Trainer trainer);
+  void changePassword(String username, String oldPassword, String newPassword);
+  void toggleActive(String username, String password);
 }

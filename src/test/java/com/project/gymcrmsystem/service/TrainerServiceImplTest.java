@@ -11,11 +11,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -103,6 +106,97 @@ class TrainerServiceImplTest {
 
     assertEquals("Trainer not found", exception.getMessage());
     verify(trainerDao, never()).update(any());
+  }
+
+  @Test
+  void shouldReturnAllTrainers() {
+    List<Trainer> trainers = List.of(trainer("John", "Doe"), trainer("Jane", "Doe"));
+    when(trainerDao.findAll()).thenReturn(trainers);
+
+    List<Trainer> result = service.findAll();
+
+    assertSame(trainers, result);
+    verify(trainerDao).findAll();
+  }
+
+  @Test
+  void shouldFindTrainerById() {
+    Trainer trainer = trainer("John", "Doe");
+    when(trainerDao.findById(1L)).thenReturn(Optional.of(trainer));
+
+    Optional<Trainer> result = service.findById(1L);
+
+    assertTrue(result.isPresent());
+    assertSame(trainer, result.orElseThrow());
+    verify(trainerDao).findById(1L);
+  }
+
+  @Test
+  void shouldChangeTrainerPasswordWhenCredentialsAndPasswordAreValid() {
+    Trainer trainer = trainer("John", "Doe");
+    trainer.setUsername("john.doe");
+    trainer.setPassword("old-password");
+    when(trainerDao.findByUsername("john.doe")).thenReturn(Optional.of(trainer));
+
+    service.changePassword("john.doe", "old-password", "new-password");
+
+    assertEquals("new-password", trainer.getPassword());
+  }
+
+  @Test
+  void shouldRejectTrainerPasswordThatMatchesCurrentPassword() {
+    Trainer trainer = trainer("John", "Doe");
+    trainer.setUsername("john.doe");
+    trainer.setPassword("old-password");
+    when(trainerDao.findByUsername("john.doe")).thenReturn(Optional.of(trainer));
+
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        () -> service.changePassword("john.doe", "old-password", "old-password"));
+
+    assertEquals("New password cannot be the same as the old password", exception.getMessage());
+    assertEquals("old-password", trainer.getPassword());
+  }
+
+  @Test
+  void shouldRejectTrainerPasswordShorterThanTenCharacters() {
+    Trainer trainer = trainer("John", "Doe");
+    trainer.setUsername("john.doe");
+    trainer.setPassword("old-password");
+    when(trainerDao.findByUsername("john.doe")).thenReturn(Optional.of(trainer));
+
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        () -> service.changePassword("john.doe", "old-password", "short"));
+
+    assertEquals("New password does not meet the requirements", exception.getMessage());
+    assertEquals("old-password", trainer.getPassword());
+  }
+
+  @Test
+  void shouldToggleTrainerActiveStatusWhenCredentialsAreValid() {
+    Trainer trainer = trainer("John", "Doe");
+    trainer.setUsername("john.doe");
+    trainer.setPassword("valid-password");
+    trainer.setActive(true);
+    when(trainerDao.findByUsername("john.doe")).thenReturn(Optional.of(trainer));
+
+    service.toggleActive("john.doe", "valid-password");
+
+    assertFalse(trainer.isActive());
+  }
+
+  @Test
+  void shouldNotToggleTrainerStatusWhenCredentialsAreInvalid() {
+    Trainer trainer = trainer("John", "Doe");
+    trainer.setUsername("john.doe");
+    trainer.setPassword("valid-password");
+    trainer.setActive(true);
+    when(trainerDao.findByUsername("john.doe")).thenReturn(Optional.of(trainer));
+
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        () -> service.toggleActive("john.doe", "wrong-password"));
+
+    assertEquals("Invalid username or password", exception.getMessage());
+    assertTrue(trainer.isActive());
   }
 
   private Trainer trainer(String firstName, String lastName) {
