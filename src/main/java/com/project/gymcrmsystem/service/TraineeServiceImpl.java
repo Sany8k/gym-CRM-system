@@ -102,7 +102,7 @@ public class TraineeServiceImpl implements TraineeService {
   @Transactional
   @Override
   public void toggleActive(String username, String password) {
-    log.debug("Toggleing trainee status for username={}", username);
+    log.debug("Toggling trainee status for username={}", username);
     Trainee trainee = authenticateOrThrow(username, password);
 
     trainee.setActive(!trainee.isActive());
@@ -122,12 +122,16 @@ public class TraineeServiceImpl implements TraineeService {
   }
 
   private Trainee authenticateOrThrow(String username, String password) {
+    log.debug("Authenticating trainee with username={}", username);
     if (!authenticate(username, password)) {
       throw new IllegalArgumentException("Invalid username or password");
     }
+
+    log.info("Authenticating trainee with username={}", username);
     return traineeDao.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("Trainee not found"));
   }
 
+  @Override
   public boolean authenticate(String username, String password) {
     Optional<Trainee> trainee = traineeDao.findByUsername(username);
     return trainee.map(value -> value.getPassword().equals(password)).orElse(false);

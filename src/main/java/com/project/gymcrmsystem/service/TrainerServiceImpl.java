@@ -111,6 +111,7 @@ public class TrainerServiceImpl implements TrainerService {
     return traineeDao.findByUsername(username).isPresent() || trainerDao.findByUsername(username).isPresent();
   }
 
+  @Override
   public boolean authenticate(String username, String password) {
     Optional<Trainer> trainer = trainerDao.findByUsername(username);
       return trainer.map(value -> value.getPassword().equals(password)).orElse(false);
