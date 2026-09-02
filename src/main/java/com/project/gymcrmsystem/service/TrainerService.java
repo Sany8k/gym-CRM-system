@@ -12,4 +12,5 @@ public interface TrainerService {
   Trainer update(Trainer trainer);
   void changePassword(String username, String oldPassword, String newPassword);
   void toggleActive(String username, String password);
+  boolean authenticate(String username, String password);
 }
