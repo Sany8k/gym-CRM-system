@@ -89,11 +89,6 @@ public class TrainerServiceImpl implements TrainerService {
     log.debug("Changing password for trainer with username={}", username);
     Trainer trainer = authenticateAndThrow(username, oldPassword);
 
-    if (!trainer.getPassword().equals(newPassword)) {
-      log.warn("New password cannot be the same as the old password for trainer with username={}", username);
-      throw new IllegalArgumentException("New password cannot be the same as the old password");
-    }
-
     if (!validatePassword(newPassword)) {
       log.warn("New password does not meet the requirements for trainer with username={}", username);
       throw new IllegalArgumentException("New password does not meet the requirements");
@@ -116,7 +111,7 @@ public class TrainerServiceImpl implements TrainerService {
     return traineeDao.findByUsername(username).isPresent() || trainerDao.findByUsername(username).isPresent();
   }
 
-  private boolean authenticate(String username, String password) {
+  public boolean authenticate(String username, String password) {
     Optional<Trainer> trainer = trainerDao.findByUsername(username);
       return trainer.map(value -> value.getPassword().equals(password)).orElse(false);
   }
