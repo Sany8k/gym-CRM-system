@@ -1,12 +1,19 @@
 package com.project.gymcrmsystem.dao;
 
 import com.project.gymcrmsystem.model.Trainee;
+import com.project.gymcrmsystem.model.Trainer;
+import com.project.gymcrmsystem.model.Training;
+import com.project.gymcrmsystem.model.TrainingType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,6 +45,56 @@ public class TraineeDaoImpl implements TraineeDao {
       return Optional.empty();
     }
     return Optional.of(results.getFirst());
+  }
+
+  @Override
+  public List<Training> findByTraineeCriteria(
+      String username,
+      LocalDate fromDate,
+      LocalDate toDate,
+      String trainerName,
+      String trainingTypeName
+  ) {
+    CriteriaBuilder cb = em.getCriteriaBuilder();
+
+    CriteriaQuery<Training> query = cb.createQuery(Training.class);
+    Root<Training> root = query.from(Training.class);
+
+    List<Predicate> predicates = new ArrayList<>();
+
+    Join<Training, Trainee> joinTrainee = root.join("trainee");
+
+    predicates.add(
+        cb.equal(joinTrainee.get("username"), username)
+    );
+
+    if (fromDate != null) {
+      predicates.add(
+          cb.greaterThanOrEqualTo(root.get("date"), fromDate)
+      );
+    }
+    if (toDate != null) {
+      predicates.add(
+          cb.lessThanOrEqualTo(root.get("date"), toDate)
+      );
+    }
+
+    if (StringUtils.hasText(trainerName)) {
+      Join<Training, Trainer> joinTrainer = root.join("trainer");
+      predicates.add(
+          cb.equal(joinTrainer.get("firstName"), trainerName)
+      );
+    }
+
+    if (StringUtils.hasText(trainingTypeName)) {
+      Join<Training, TrainingType> joinTrainingType = root.join("trainingType");
+      predicates.add(
+          cb.equal(joinTrainingType.get("name"), trainingTypeName)
+      );
+    }
+
+    query.select(root).where(predicates.toArray(new Predicate[0]));
+    return em.createQuery(query).getResultList();
   }
 
   @Override

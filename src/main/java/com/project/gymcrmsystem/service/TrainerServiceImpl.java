@@ -152,8 +152,8 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     if (changes.getSpecialization() == null) {
-        log.warn("Trainer with username={} is empty", username);
-        throw new IllegalArgumentException("Invalid specialization: Specialization cannot be null");
+      log.warn("Trainer with username={} is empty", username);
+      throw new IllegalArgumentException("Invalid specialization: Specialization cannot be null");
     }
 
     trainer.setFirstName(changes.getFirstName());
