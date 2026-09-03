@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -135,6 +136,57 @@ public class TraineeServiceImpl implements TraineeService {
   public boolean authenticate(String username, String password) {
     Optional<Trainee> trainee = traineeDao.findByUsername(username);
     return trainee.map(value -> value.getPassword().equals(password)).orElse(false);
+  }
+
+  @Override
+  public Optional<Trainee> findByUsername(String username, String password) {
+    Optional<Trainee> trainee = traineeDao.findByUsername(username);
+
+    if (trainee.isEmpty()) {
+      throw new IllegalArgumentException("Trainee not found");
+    }
+
+    if (!trainee.get().getPassword().equals(password)) {
+      throw new IllegalArgumentException("Invalid password");
+    }
+    return trainee;
+  }
+
+  @Override
+  @Transactional
+  public Trainee updateProfile(String username, String password, Trainee changes) {
+    log.debug("Updating trainee with username={}", username);
+    Trainee trainee = authenticateOrThrow(username, password);
+
+    if (StringUtils.hasText(changes.getFirstName())) {
+      log.info("Updating trainee with first name={}", changes.getFirstName());
+      trainee.setFirstName(changes.getFirstName());
+    }
+
+    if (StringUtils.hasText(changes.getLastName())) {
+      log.info("Updating trainee with last name={}", changes.getLastName());
+      trainee.setLastName(changes.getLastName());
+    }
+
+    if (StringUtils.hasText(changes.getAddress())) {
+      log.info("Updating trainee with address={}", changes.getAddress());
+      trainee.setAddress(changes.getAddress());
+    }
+
+    if (StringUtils.hasText(String.valueOf(changes.getDateOfBirth()))) {
+      log.info("Updating trainee with date of birth={}", changes.getDateOfBirth());
+      trainee.setDateOfBirth(changes.getDateOfBirth());
+    }
+
+    return traineeDao.save(trainee);
+  }
+
+  @Override
+  @Transactional
+  public void deleteByUsername(String username, String password) {
+    log.info("Deleting trainee with username={}", username);
+    Trainee trainee = authenticateOrThrow(username, password);
+    traineeDao.deleteById(trainee.getId());
   }
 
   private boolean validatePassword(String password) {

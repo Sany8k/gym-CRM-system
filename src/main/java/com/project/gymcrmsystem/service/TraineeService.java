@@ -14,4 +14,7 @@ public interface TraineeService {
   void toggleActive(String username, String password);
   void deleteById(Long id);
   boolean authenticate(String username, String password);
+  Optional<Trainee> findByUsername(String username, String password);
+  Trainee updateProfile(String username, String password, Trainee changes);
+  void deleteByUsername(String username, String password);
 }

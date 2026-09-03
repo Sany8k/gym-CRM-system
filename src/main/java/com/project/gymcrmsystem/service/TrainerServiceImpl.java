@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -115,6 +116,41 @@ public class TrainerServiceImpl implements TrainerService {
   public boolean authenticate(String username, String password) {
     Optional<Trainer> trainer = trainerDao.findByUsername(username);
       return trainer.map(value -> value.getPassword().equals(password)).orElse(false);
+  }
+
+  @Override
+  public Optional<Trainer> findByUsername(String username, String password) {
+    Optional<Trainer> trainer = trainerDao.findByUsername(username);
+
+    if (trainer.isEmpty()) {
+      log.warn("Trainer with username={} not found", username);
+      throw new IllegalArgumentException("Trainer with username " + username + " not found");
+    }
+
+    if (!trainer.get().getPassword().equals(password)) {
+      log.warn("Invalid password for trainer with username={}", username);
+      throw new IllegalArgumentException("Invalid password");
+    }
+
+    log.info("Trainer found with id={} and username={}", trainer.get().getId(), username);
+    return trainer;
+  }
+
+  @Override
+  public Trainer updateProfile(String username, String password, Trainer changes) {
+    Trainer trainer = authenticateAndThrow(username, password);
+
+    if (StringUtils.hasText(changes.getFirstName())) {
+      trainer.setFirstName(changes.getFirstName());
+    }
+    if (StringUtils.hasText(changes.getLastName())) {
+      trainer.setLastName(changes.getLastName());
+    }
+    if (trainer.getSpecialization() != null) {
+      trainer.setSpecialization(changes.getSpecialization());
+    }
+
+    return trainerDao.save(trainer);
   }
 
   private Trainer authenticateAndThrow(String username, String password) {
