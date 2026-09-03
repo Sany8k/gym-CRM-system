@@ -1,0 +1,6 @@
+TRAINEE|1|John|Smith|John.Smith|abc123|true|2000-05-10|Odessa
+TRAINER|1|Mike|Brown|Mike.Brown|xyz123|true|FITNESS
+TRAINING|1|1|1|Morning Training|FITNESS|2026-08-20|60
+TRAINEE|2|Jack|Doe|Jack.Doe|def456|true|2000-05-10|Kyiv
+TRAINER|2|David|Brown|David.Brown|zyx321|true|YOGA
+TRAINING|2|2|2|Evening Training|YOGA|2026-08-20|60
