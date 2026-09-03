@@ -3,7 +3,6 @@ package com.project.gymcrmsystem.dao;
 import com.project.gymcrmsystem.model.Trainee;
 import com.project.gymcrmsystem.model.Trainer;
 import com.project.gymcrmsystem.model.Training;
-import com.project.gymcrmsystem.model.TrainingType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -57,8 +56,7 @@ public class TrainerDaoImpl implements TrainerDao {
       String username,
       LocalDate fromDate,
       LocalDate toDate,
-      String traineeName,
-      String trainingTypeName
+      String traineeName
   ) {
     CriteriaBuilder cb = em.getCriteriaBuilder();
 
@@ -88,13 +86,6 @@ public class TrainerDaoImpl implements TrainerDao {
       Join<Training, Trainee> joinTrainee = root.join("trainee");
       predicates.add(
           cb.equal(joinTrainee.get("firstName"), traineeName)
-      );
-    }
-
-    if (StringUtils.hasText(trainingTypeName)) {
-      Join<Training, TrainingType> joinTrainingType = root.join("trainingType");
-      predicates.add(
-          cb.equal(joinTrainingType.get("name"), trainingTypeName)
       );
     }
 

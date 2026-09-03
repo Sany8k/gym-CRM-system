@@ -19,8 +19,7 @@ public interface TrainerDao {
       String username,
       LocalDate fromDate,
       LocalDate toDate,
-      String traineeName,
-      String trainingTypeName
+      String traineeName
   );
 
   Trainer save(Trainer trainer);
