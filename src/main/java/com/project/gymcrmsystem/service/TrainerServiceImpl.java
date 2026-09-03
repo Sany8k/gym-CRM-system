@@ -139,18 +139,28 @@ public class TrainerServiceImpl implements TrainerService {
   @Override
   @Transactional
   public Trainer updateProfile(String username, String password, Trainer changes) {
+    log.debug("Updating profile for trainer with username={}", username);
     Trainer trainer = authenticateAndThrow(username, password);
 
-    if (StringUtils.hasText(changes.getFirstName()) && changes.getFirstName() != null) {
-      trainer.setFirstName(changes.getFirstName());
+    if (!StringUtils.hasText(changes.getFirstName())) {
+      log.warn("Trainer with username={} is empty", username);
+      throw new IllegalArgumentException("Invalid first name: First name cannot be empty");
     }
-    if (StringUtils.hasText(changes.getLastName()) && changes.getLastName() != null) {
-      trainer.setLastName(changes.getLastName());
-    }
-    if (changes.getSpecialization() != null) {
-      trainer.setSpecialization(changes.getSpecialization());
+    if (!StringUtils.hasText(changes.getLastName())) {
+      log.warn("Trainer with username={} is empty", username);
+      throw new IllegalArgumentException("Invalid last name: Last name cannot be empty");
     }
 
+    if (changes.getSpecialization() == null) {
+        log.warn("Trainer with username={} is empty", username);
+        throw new IllegalArgumentException("Invalid specialization: Specialization cannot be null");
+    }
+
+    trainer.setFirstName(changes.getFirstName());
+    trainer.setLastName(changes.getLastName());
+    trainer.setSpecialization(changes.getSpecialization());
+
+    log.info("Specialization changed for trainer with username={}", username);
     return trainer;
   }
 

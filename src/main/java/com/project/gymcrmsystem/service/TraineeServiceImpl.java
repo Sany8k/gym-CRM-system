@@ -158,27 +158,23 @@ public class TraineeServiceImpl implements TraineeService {
     log.debug("Updating trainee with username={}", username);
     Trainee trainee = authenticateOrThrow(username, password);
 
-    if (StringUtils.hasText(changes.getFirstName()) && changes.getFirstName() != null) {
-      log.info("Updating trainee with first name={}", changes.getFirstName());
-      trainee.setFirstName(changes.getFirstName());
+
+    if (!StringUtils.hasText(changes.getFirstName())) {
+      log.warn("Trainee with username={} is empty", username);
+      throw new IllegalArgumentException("Invalid first name: First name cannot be empty");
     }
 
-    if (StringUtils.hasText(changes.getLastName()) && changes.getLastName() != null) {
-      log.info("Updating trainee with last name={}", changes.getLastName());
-      trainee.setLastName(changes.getLastName());
+    if (!StringUtils.hasText(changes.getLastName())) {
+      log.warn("Trainee with username={} is empty", username);
+      throw new IllegalArgumentException("Invalid last name: Last name cannot be empty");
     }
 
-    if (StringUtils.hasText(changes.getAddress()) && changes.getAddress() != null) {
-      log.info("Updating trainee with address={}", changes.getAddress());
-      trainee.setAddress(changes.getAddress());
-    }
+    trainee.setFirstName(changes.getFirstName());
+    trainee.setLastName(changes.getLastName());
+    trainee.setDateOfBirth(changes.getDateOfBirth());
+    trainee.setAddress(changes.getAddress());
 
-    if (StringUtils.hasText(String.valueOf(changes.getDateOfBirth())) && changes.getDateOfBirth() != null) {
-      log.info("Updating trainee with date of birth={}", changes.getDateOfBirth());
-      trainee.setDateOfBirth(changes.getDateOfBirth());
-    }
-
-    return traineeDao.save(trainee);
+    return trainee;
   }
 
   @Override
