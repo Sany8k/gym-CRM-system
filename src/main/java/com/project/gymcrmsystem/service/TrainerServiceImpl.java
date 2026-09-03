@@ -137,20 +137,21 @@ public class TrainerServiceImpl implements TrainerService {
   }
 
   @Override
+  @Transactional
   public Trainer updateProfile(String username, String password, Trainer changes) {
     Trainer trainer = authenticateAndThrow(username, password);
 
-    if (StringUtils.hasText(changes.getFirstName())) {
+    if (StringUtils.hasText(changes.getFirstName()) && changes.getFirstName() != null) {
       trainer.setFirstName(changes.getFirstName());
     }
-    if (StringUtils.hasText(changes.getLastName())) {
+    if (StringUtils.hasText(changes.getLastName()) && changes.getLastName() != null) {
       trainer.setLastName(changes.getLastName());
     }
-    if (trainer.getSpecialization() != null) {
+    if (changes.getSpecialization() != null) {
       trainer.setSpecialization(changes.getSpecialization());
     }
 
-    return trainerDao.save(trainer);
+    return trainer;
   }
 
   private Trainer authenticateAndThrow(String username, String password) {
